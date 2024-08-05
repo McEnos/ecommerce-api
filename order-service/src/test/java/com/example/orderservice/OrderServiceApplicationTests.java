@@ -1,5 +1,6 @@
 package com.example.orderservice;
 
+import com.example.orderservice.stubs.InventoryStubs;
 import io.restassured.RestAssured;
 import org.hamcrest.Matchers;
 import org.junit.jupiter.api.BeforeEach;
