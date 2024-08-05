@@ -32,13 +32,14 @@ services:
       ME_CONFIG_MONGODB_ADMINPASSWORD: root
   mysqldb:
     image: mysql
-    restart: always
+    restart: unless-stopped
+    container_name: mysqldb
     environment:
       MYSQL_ROOT_PASSWORD: root
     ports:
       - "3306:3306"
     volumes:
-      - "./data:/var/lib/mysql"
+      - "./data/mysql:/var/lib/mysql"
     networks:
       - ecommerce-network
   phpmyadmin:
@@ -52,6 +53,31 @@ services:
       - mysqldb
     networks:
       - ecommerce-network
+
+  keycloak-server:
+    image: quay.io/keycloak/keycloak:latest
+    restart: unless-stopped
+    entrypoint: /opt/keycloak/bin/kc.sh start-dev
+    volumes:
+      - "./data/keycloak:/var/lib/keycloak/data"
+
+    environment:
+      KC_DB_URL_DATABASE: keycloak
+      KC_DB_URL_PORT: 3306
+      KC_DB_URL_HOST: mysqldb
+      KC_HOSTNAME_STRICT: false
+      KC_DB: mysql #database vendor name
+      KC_DB_USERNAME: root
+      KC_DB_PASSWORD: root
+      KEYCLOAK_ADMIN_PASSWORD: admin
+      KEYCLOAK_ADMIN: admin
+    ports:
+      - "8181:8080"
+    depends_on:
+      - mysqldb
+    networks:
+      - ecommerce-network
+
 
 networks:
   ecommerce-network:
