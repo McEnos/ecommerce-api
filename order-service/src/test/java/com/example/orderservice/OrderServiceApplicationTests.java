@@ -7,11 +7,13 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
 import org.springframework.boot.testcontainers.service.connection.ServiceConnection;
+import org.springframework.cloud.contract.wiremock.AutoConfigureWireMock;
 import org.testcontainers.containers.MySQLContainer;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 
 @SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@AutoConfigureWireMock(port = 0)
 class OrderServiceApplicationTests {
     @ServiceConnection
     static MySQLContainer mySQLContainer = new MySQLContainer("mysql:latest");
@@ -33,12 +35,13 @@ class OrderServiceApplicationTests {
     void shouldSubmitOrder() {
         String requestBody = """
                 {
-                    "skuCode":"Iphone 15",
+                    "skuCode":"iphone_15",
                     "quantity":"10",
                     "price":"1000"
                 }
                 """;
-        String response = RestAssured.given()
+        InventoryStubs.stubInventoryCall("iphone_15", 1);
+        var response = RestAssured.given()
                 .contentType("application/json")
                 .body(requestBody)
                 .when()
