@@ -1,12 +1,11 @@
 package com.example.orderservice.feign;
 
 
-import org.springframework.cloud.openfeign.FeignClient;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.service.annotation.GetExchange;
 
-@FeignClient(name= "${inventory.name}")
+//@FeignClient(name= "${inventory.name}")
 public interface InventoryClient {
-    @GetMapping("/${inventory.name}/api/inventory")
+    @GetExchange("/api/inventory")
     boolean isInStock(@RequestParam String skuCode, @RequestParam Integer quantity);
 }
